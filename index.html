@@ -1,133 +1,129 @@
-
-
-
-
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
-
-
-<!--kk eae men-->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> 
-<link rel="stylesheet" type="text/css" href="style.css">
-<meta charset="utf-8">
-<meta name="theme-color" content="#3a7bd5">
-<meta name="apple-mobile-web-app-status-bar-style" content="#3a7bd5">
-<meta name="msapplication-navbutton-color" content="#3a7bd5">
-<link rel="icon" href="img/favicon.ico" />
-<script src="https://unpkg.com/tippy.js@3/dist/tippy.all.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<title>Ariel Reis!</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="Ariel Reis, AI Product Engineer specializing in Clojure, JVM, Datomic, AWS, ElasticSearch, and Kotlin.">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="icon" href="img/favicon.ico">
+  <title>Ariel Reis - AI Product Engineer</title>
 </head>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-86491625-2"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-86491625-2');
-</script>
-
 <body>
-
-<section class="bio">
-  <img class="bio-avatar" src="img/eu.jpg" width="150" />
-  <h1 class="bio-name">Ariel Reis</h1>
-  <nav>
-    <a data-tippy="Meu GitHub" data-tippy-delay="50" data-tippy-arrow="true" data-tippy-animation="shift-toward" class="bio-link" href="https://github.com/arieldossantos">
-      <i class="fa fa-github" aria-hidden="true"></i>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Ariel Reis">
+      <img class="brand-avatar" src="img/eu.jpg" alt="Ariel Reis photo">
+      <span>Ariel Reis</span>
     </a>
-    <a data-tippy="Meu LinkedIn" data-tippy-delay="50" data-tippy-arrow="true" data-tippy-animation="perspective"  class="bio-link" href="https://www.linkedin.com/in/arielllllllll">
-      <i class="fa fa-linkedin" aria-hidden="true"></i>
-    </a>
-    <a data-tippy="Meus artigos" data-tippy-delay="50" data-tippy-arrow="true" data-tippy-animation="shift-away" class="bio-link" href="https://1drv.ms/f/s!AnTGeri3-OuZh01-mAagIN-LhAwQ">
-      <i class="fa fa-book" aria-hidden="true"></i>
-    </a>
-    <br/>
-    <div>
-    <p>&nbsp;</p>
-    	<span class="bio-description">
-    		Olá! Me chamo Ariel, e sou desenvolvedor backend. 
-    		<br/><br/>
-    		<img data-tippy="Golang" src="img/golang.ico" height="24px">
-    		<img data-tippy="Kotlin" src="img/kotlin.png" height="24px">
-    		<img data-tippy="JavaScript" src="img/js.png" height="24px">
-    		<img data-tippy="React Native" src="img/react.png" height="24px">
-    	</span>
-    </div>
-  </nav>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="#skills">Skills</a>
+      <a href="#work">Knowledge</a>
+      <a href="/blog/">Blog</a>
+      <a href="https://github.com/arieldossantos">GitHub</a>
+      <a href="https://www.linkedin.com/in/arielllllllll">LinkedIn</a>
+    </nav>
+  </header>
 
-  <!-- copia não comédia -->
-</section>
-<script type="text/javascript">window.onload = function(){
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">AI Product Engineer</p>
+        <h1 id="hero-title">AI, backend, and data systems with product judgment.</h1>
+        <p class="hero-text">
+          I am Ariel Reis, an AI Product Engineer with deep knowledge across product engineering,
+          backend architecture, data modeling, cloud infrastructure, search, and AI integrations.
+        </p>
+        <div class="hero-actions" aria-label="Primary links">
+          <a class="button primary" href="#skills">View skills</a>
+          <a class="button secondary" href="/blog/">Read the blog</a>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="Professional summary">
+        <img class="profile-photo" src="img/eu.jpg" alt="Ariel Reis photo">
+        <div>
+          <p class="panel-label">Profile</p>
+          <p class="panel-title">Product sense, backend depth, and practical AI knowledge.</p>
+        </div>
+      </aside>
+    </section>
 
-  document.querySelector(".spinner-parent").style.display = "none";
+    <section class="section" id="skills" aria-labelledby="skills-title">
+      <div class="section-heading">
+        <p class="eyebrow">Skills</p>
+        <h2 id="skills-title">Core stack</h2>
+      </div>
+      <div class="competency-grid">
+        <article class="competency">
+          <span class="competency-mark">CLJ</span>
+          <h3>Clojure</h3>
+          <p>Designing expressive, functional systems that are easy to evolve, with strong attention to domain modeling and operational simplicity.</p>
+        </article>
+        <article class="competency">
+          <span class="competency-mark">JVM</span>
+          <h3>JVM</h3>
+          <p>Building resilient, observable, scale-ready services in mature backend ecosystems.</p>
+        </article>
+        <article class="competency">
+          <span class="competency-mark">D</span>
+          <h3>Datomic</h3>
+          <p>Temporal and immutable modeling for products that need history, auditability, and richer ways to read data.</p>
+        </article>
+        <article class="competency">
+          <span class="competency-mark">AWS</span>
+          <h3>AWS certified</h3>
+          <p>Cloud architecture, deployment, and operations with security, cost, automation, and availability in mind.</p>
+        </article>
+        <article class="competency">
+          <span class="competency-mark">ES</span>
+          <h3>ElasticSearch</h3>
+          <p>Search, indexing, and data exploration for fast, relevant, and actionable product experiences.</p>
+        </article>
+        <article class="competency">
+          <span class="competency-mark">KT</span>
+          <h3>Kotlin</h3>
+          <p>Modern APIs and applications in the JVM ecosystem, with clear, typed, and productive code.</p>
+        </article>
+      </div>
+    </section>
 
-};</script>
+    <section class="section split" id="work" aria-labelledby="work-title">
+      <div class="section-heading">
+        <p class="eyebrow">Knowledge</p>
+        <h2 id="work-title">Technical depth with product context</h2>
+      </div>
+      <div class="work-list">
+        <article class="work-item">
+          <span>01</span>
+          <div>
+            <h3>AI product engineering</h3>
+            <p>Strong understanding of LLM-based product patterns, evaluation, integrations, and the tradeoffs behind useful AI experiences.</p>
+          </div>
+        </article>
+        <article class="work-item">
+          <span>02</span>
+          <div>
+            <h3>Backend architecture</h3>
+            <p>Deep knowledge of APIs, domain modeling, JVM systems, observability, reliability, and long-term maintainability.</p>
+          </div>
+        </article>
+        <article class="work-item">
+          <span>03</span>
+          <div>
+            <h3>Data, search, and cloud</h3>
+            <p>Practical experience with immutable data, ElasticSearch, AWS, and platform foundations that support careful product evolution.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
 
-<div class="spinner-parent" style=" padding-top: 15%;">
-  <div class="spinner">
-    <div class="double-bounce1"></div>
-    <div class="double-bounce2"></div>
-  </div>
-</div>
-<style type="text/css">
-.spinner-parent {
-  left: 0px;
-  top: 0px;
-  position: fixed;
-  width: 100%;
-  background-color: white;
-  height: 100vh;
-  align-items: center;
-}
-
-  .spinner {
-  width: 40px;
-  height: 40px;
-
-  position: relative;
-  margin: 100px auto;
-}
-
-.double-bounce1, .double-bounce2 {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #333;
-  opacity: 0.6;
-  position: absolute;
-  top: 0;
-  left: 0;
-  
-  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-  animation: sk-bounce 2.0s infinite ease-in-out;
-}
-
-.double-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
-}
-
-@-webkit-keyframes sk-bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
-}
-
-@keyframes sk-bounce {
-  0%, 100% { 
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% { 
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
-}  
-</style>
-<script type="text/javascript">
-	
-</script>
-<!-- Estou estudando a possibilidade de colocar meu portfólio aqui, mas n sei se vai ficar legal -->
+  <footer class="site-footer">
+    <span>Ariel Reis</span>
+    <nav aria-label="Footer links">
+      <a href="https://github.com/arieldossantos">GitHub</a>
+      <a href="https://www.linkedin.com/in/arielllllllll">LinkedIn</a>
+      <a href="/blog/">Blog</a>
+    </nav>
+  </footer>
 </body>
 </html>
