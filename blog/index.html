@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="Ariel Reis' blog about product engineering, AI, backend, Clojure, JVM, Datomic, AWS, ElasticSearch, and Kotlin.">
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <link rel="icon" href="/img/favicon.ico">
+  <title>Blog - Ariel Reis</title>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Ariel Reis">
+      <img class="brand-avatar" src="/img/eu.jpg" alt="Ariel Reis photo">
+      <span>Ariel Reis</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="/#skills">Skills</a>
+      <a href="/#work">Knowledge</a>
+      <a href="/blog/">Blog</a>
+      <a href="https://github.com/arieldossantos">GitHub</a>
+      <a href="https://www.linkedin.com/in/arielllllllll">LinkedIn</a>
+    </nav>
+  </header>
+
+  <main class="blog-main">
+    <section class="blog-hero" aria-labelledby="blog-title">
+      <p class="eyebrow">Blog</p>
+      <h1 id="blog-title">Notes on product, AI, and engineering.</h1>
+      <p class="hero-text">
+        Short notes on technical decisions, product learnings, and applied engineering.
+      </p>
+    </section>
+
+    <div class="blog-toolbar">
+      <a href="/">Back to home</a>
+      <span id="blog-status" class="article-meta">Loading posts...</span>
+    </div>
+
+    <section id="blog-content" class="posts-list" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Ariel Reis</span>
+    <nav aria-label="Footer links">
+      <a href="https://github.com/arieldossantos">GitHub</a>
+      <a href="https://www.linkedin.com/in/arielllllllll">LinkedIn</a>
+      <a href="/blog/">Blog</a>
+    </nav>
+  </footer>
+
+  <script>
+    const blogConfig = {
+      owner: "arieldossantos",
+      repo: "arieldossantos.github.io",
+      branch: "master",
+      postsPath: "posts"
+    };
+
+    const contentEl = document.querySelector("#blog-content");
+    const statusEl = document.querySelector("#blog-status");
+
+    const escapeHtml = (value) => String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+    function parseFrontmatter(markdown) {
+      const match = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+      const data = {};
+
+      if (!match) {
+        return { data, body: markdown };
+      }
+
+      match[1].split("\n").forEach((line) => {
+        const field = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+        if (!field) return;
+
+        const key = field[1].trim();
+        let value = field[2].trim().replace(/^["']|["']$/g, "");
+
+        if (value.startsWith("[") && value.endsWith("]")) {
+          value = value.slice(1, -1).split(",").map((item) => item.trim().replace(/^["']|["']$/g, "")).filter(Boolean);
+        }
+
+        data[key] = value;
+      });
+
+      return { data, body: markdown.slice(match[0].length) };
+    }
+
+    function firstHeading(markdown) {
+      const match = markdown.match(/^#\s+(.+)$/m);
+      return match ? match[1].trim() : "";
+    }
+
+    function titleFromFilename(filename) {
+      return filename
+        .replace(/\.md$/i, "")
+        .replace(/^\d{4}-\d{2}-\d{2}-/, "")
+        .replaceAll("-", " ")
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString("en", { day: "2-digit", month: "long", year: "numeric" });
+    }
+
+    function inlineMarkdown(text) {
+      const code = [];
+      let output = escapeHtml(text).replace(/`([^`]+)`/g, (_, value) => {
+        code.push(`<code>${value}</code>`);
+        return `%%CODE${code.length - 1}%%`;
+      });
+
+      output = output
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+      code.forEach((html, index) => {
+        output = output.replace(`%%CODE${index}%%`, html);
+      });
+
+      return output;
+    }
+
+    function renderMarkdown(markdown) {
+      const { body } = parseFrontmatter(markdown);
+      const lines = body.replace(/\r\n/g, "\n").split("\n");
+      const html = [];
+      let paragraph = [];
+      let listOpen = false;
+      let codeOpen = false;
+      let codeLanguage = "";
+      let codeLines = [];
+
+      function flushParagraph() {
+        if (!paragraph.length) return;
+        html.push(`<p>${inlineMarkdown(paragraph.join(" "))}</p>`);
+        paragraph = [];
+      }
+
+      function closeList() {
+        if (!listOpen) return;
+        html.push("</ul>");
+        listOpen = false;
+      }
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith("```")) {
+          if (codeOpen) {
+            html.push(`<pre><code class="language-${escapeHtml(codeLanguage)}">${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+            codeOpen = false;
+            codeLanguage = "";
+            codeLines = [];
+          } else {
+            flushParagraph();
+            closeList();
+            codeOpen = true;
+            codeLanguage = trimmed.slice(3).trim();
+          }
+          return;
+        }
+
+        if (codeOpen) {
+          codeLines.push(line);
+          return;
+        }
+
+        if (!trimmed) {
+          flushParagraph();
+          closeList();
+          return;
+        }
+
+        const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
+        if (heading) {
+          flushParagraph();
+          closeList();
+          const level = Math.min(heading[1].length, 6);
+          html.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
+          return;
+        }
+
+        const listItem = trimmed.match(/^[-*]\s+(.+)$/);
+        if (listItem) {
+          flushParagraph();
+          if (!listOpen) {
+            html.push("<ul>");
+            listOpen = true;
+          }
+          html.push(`<li>${inlineMarkdown(listItem[1])}</li>`);
+          return;
+        }
+
+        const quote = trimmed.match(/^>\s?(.+)$/);
+        if (quote) {
+          flushParagraph();
+          closeList();
+          html.push(`<blockquote>${inlineMarkdown(quote[1])}</blockquote>`);
+          return;
+        }
+
+        paragraph.push(trimmed);
+      });
+
+      flushParagraph();
+      closeList();
+
+      if (codeOpen) {
+        html.push(`<pre><code class="language-${escapeHtml(codeLanguage)}">${escapeHtml(codeLines.join("\n"))}</code></pre>`);
+      }
+
+      return html.join("\n");
+    }
+
+    function postUrl(filename) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("post", filename.replace(/\.md$/i, ""));
+      return url.pathname + url.search;
+    }
+
+    function renderTags(tags) {
+      const list = Array.isArray(tags) ? tags : String(tags || "").split(",").map((tag) => tag.trim()).filter(Boolean);
+      if (!list.length) return "";
+      return `<div class="tag-list">${list.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>`;
+    }
+
+    function renderList(posts) {
+      statusEl.textContent = `${posts.length} ${posts.length === 1 ? "post" : "posts"}`;
+
+      if (!posts.length) {
+        contentEl.innerHTML = `
+          <div class="empty-state">
+            <strong>No posts published yet.</strong>
+            <p>Add <code>.md</code> files to the <code>/posts</code> folder and they will appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      contentEl.className = "posts-list";
+      contentEl.innerHTML = posts.map((post) => `
+        <a class="post-card" href="${postUrl(post.filename)}">
+          <time>${escapeHtml(formatDate(post.date))}</time>
+          <h2>${escapeHtml(post.title)}</h2>
+          ${post.description ? `<p>${escapeHtml(post.description)}</p>` : ""}
+          ${renderTags(post.tags)}
+        </a>
+      `).join("");
+    }
+
+    function renderArticle(post) {
+      document.title = `${post.title} - Ariel Reis`;
+      statusEl.innerHTML = `<a href="/blog/">All posts</a>`;
+      contentEl.className = "";
+      contentEl.innerHTML = `
+        <article class="article">
+          <p class="article-meta">${escapeHtml(formatDate(post.date))}</p>
+          ${renderMarkdown(post.markdown)}
+        </article>
+      `;
+    }
+
+    async function loadPostsFromManifest() {
+      const response = await fetch(`/${blogConfig.postsPath}/index.json`, { cache: "no-store" });
+      if (!response.ok) {
+        return null;
+      }
+
+      const manifest = await response.json();
+      const filenames = Array.isArray(manifest) ? manifest : manifest.posts;
+
+      if (!Array.isArray(filenames)) {
+        return null;
+      }
+
+      const markdownFiles = filenames.filter((filename) => /\.md$/i.test(filename));
+
+      return Promise.all(markdownFiles.map(async (filename) => {
+        const markdownResponse = await fetch(`/${blogConfig.postsPath}/${filename}`);
+        const markdown = await markdownResponse.text();
+        const parsed = parseFrontmatter(markdown);
+
+        return {
+          filename,
+          slug: filename.replace(/\.md$/i, ""),
+          markdown,
+          title: parsed.data.title || firstHeading(parsed.body) || titleFromFilename(filename),
+          date: parsed.data.date || "",
+          description: parsed.data.description || parsed.data.excerpt || "",
+          tags: parsed.data.tags || []
+        };
+      }));
+    }
+
+    async function loadPosts() {
+      const localPosts = await loadPostsFromManifest();
+
+      if (localPosts) {
+        return localPosts.sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.title.localeCompare(b.title));
+      }
+
+      const apiUrl = `https://api.github.com/repos/${blogConfig.owner}/${blogConfig.repo}/contents/${blogConfig.postsPath}?ref=${blogConfig.branch}`;
+      const response = await fetch(apiUrl);
+
+      if (response.status === 404 && blogConfig.branch !== "main") {
+        blogConfig.branch = "main";
+        return loadPosts();
+      }
+
+      if (response.status === 404) {
+        return [];
+      }
+
+      if (!response.ok) {
+        throw new Error("Could not load the /posts folder.");
+      }
+
+      const files = await response.json();
+      const markdownFiles = files.filter((file) => file.type === "file" && /\.md$/i.test(file.name));
+
+      const posts = await Promise.all(markdownFiles.map(async (file) => {
+        const markdownResponse = await fetch(file.download_url);
+        const markdown = await markdownResponse.text();
+        const parsed = parseFrontmatter(markdown);
+
+        return {
+          filename: file.name,
+          slug: file.name.replace(/\.md$/i, ""),
+          markdown,
+          title: parsed.data.title || firstHeading(parsed.body) || titleFromFilename(file.name),
+          date: parsed.data.date || "",
+          description: parsed.data.description || parsed.data.excerpt || "",
+          tags: parsed.data.tags || []
+        };
+      }));
+
+      return posts.sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.title.localeCompare(b.title));
+    }
+
+    loadPosts()
+      .then((posts) => {
+        const selected = new URLSearchParams(window.location.search).get("post");
+        const post = posts.find((item) => item.slug === selected || item.filename === selected);
+
+        if (selected && post) {
+          renderArticle(post);
+          return;
+        }
+
+        if (selected) {
+          statusEl.textContent = "Post not found";
+        }
+
+        renderList(posts);
+      })
+      .catch((error) => {
+        statusEl.textContent = "Loading error";
+        contentEl.innerHTML = `
+          <div class="empty-state">
+            <strong>Could not load the posts right now.</strong>
+            <p>${escapeHtml(error.message)}</p>
+          </div>
+        `;
+      });
+  </script>
+</body>
+</html>
